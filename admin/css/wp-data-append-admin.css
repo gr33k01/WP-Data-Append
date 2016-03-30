@@ -1,0 +1,22 @@
+.form-to-append {
+    border-bottom: 1px solid #ddd;
+    float: left;
+    margin-bottom: 30px;
+}
+
+.setting-column label {
+    margin-left: 5px;
+    font-size: .9em;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.setting-column {
+    margin-bottom: 15px;
+    float: left;
+    margin-right: 20px;
+}
+
+.setting-column:first-child {
+    width: 100%;
+}

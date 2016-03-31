@@ -75,6 +75,7 @@ function run_wp_data_append() {
 
 function register_ajax_calls(){
 	add_action( 'wp_ajax_get_gf_form_object', 'get_form_object' );	
+	add_action( 'wp_ajax_get_saved_data_append_settings', 'get_saved_data_append_settings' );
 }
 
 function get_form_object() {
@@ -82,6 +83,12 @@ function get_form_object() {
 	echo json_encode(GFAPI::get_form($_POST['form_id']));
 	wp_die();
 }
+
+function get_saved_data_append_settings() {
+	header('Content-Type: application/json');
+	echo json_encode(get_option(wp_data_append_forms_to_append));
+	wp_die();
+};
 
 register_ajax_calls();
 run_wp_data_append();

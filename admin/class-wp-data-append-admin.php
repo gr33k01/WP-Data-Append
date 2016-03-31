@@ -185,6 +185,6 @@ class Wp_Data_Append_Admin {
 	}
 
 	public function wp_data_append_sanitize_forms_to_append($value) {
-		return $value;
+		return json_decode($value);
 	}
 }

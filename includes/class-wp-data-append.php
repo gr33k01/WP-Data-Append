@@ -159,9 +159,11 @@ class Wp_Data_Append {
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'display_admin_page' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
-		// $this->loader->add_action( 'admin_init', $plugin_admin, 'register_ajax_calls' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'register_settings' );
 		$this->loader->add_action( 'wp_ajax_get_gf_form_object', $plugin_admin, 'get_gf_form_object' );
+		$this->loader->add_action( 'wp_ajax_mildew', $plugin_admin, 'different_cb_name' );
+
+
 	}
 
 	/**

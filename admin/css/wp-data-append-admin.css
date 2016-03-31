@@ -2,6 +2,7 @@
     border-bottom: 1px solid #ddd;
     float: left;
     margin-bottom: 30px;
+    width: 100%;
 }
 
 .setting-column label {
@@ -16,7 +17,14 @@
     float: left;
     margin-right: 20px;
 }
-
 .setting-column:first-child {
     width: 100%;
+}
+
+.setting-column:first-child select {
+    width: auto;
+}
+
+.setting-column select {
+    width: 150px;
 }

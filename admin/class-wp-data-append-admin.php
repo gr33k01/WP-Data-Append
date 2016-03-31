@@ -49,6 +49,8 @@ class Wp_Data_Append_Admin {
 	 */
 	private $option_prefix = 'wp_data_append';
 
+	private $logger;
+
 	/**
 	 * Initialize the class and set its properties.
 	 *
@@ -60,7 +62,7 @@ class Wp_Data_Append_Admin {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
-
+		$this->logger = new Logger(__DIR__ . '/../logs/');
 	}
 
 	/**
@@ -108,24 +110,16 @@ class Wp_Data_Append_Admin {
 		// Just in case
 		wp_deregister_script('angular');
 
+		// Register scripts
 		wp_register_script('angular', plugin_dir_url( __FILE__ ) . 'js/libs/angular.min.js', array());
 		wp_register_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/wp-data-append-admin.js', array( 'angular' ), $this->version, false );
 
+		// Localize scripts
 		$ajax_url = get_site_url() . '/wp-admin/admin-ajax.php';
 		wp_localize_script( $this->plugin_name, 'dataAppendAdmin', array('ajaxUrl' => $ajax_url) );
 
+		// Enqueue scripts
 		wp_enqueue_script( $this->plugin_name );
-	}
-
-	public function register_ajax_calls() {
-		add_action('wp_ajax_get_gf_form_object', array( $this, 'get_gf_form_object' ));
-	}
-
-	public function get_gf_form_object() {
-		header('Content-Type: application/json');
-		// echo json_encode(GFAPI::get_form($_POST['form_id']));
-		echo 'mildew';
-		wp_die(); 
 	}
 
 	/**
@@ -140,7 +134,7 @@ class Wp_Data_Append_Admin {
 			'manage_options',
 			'wp_data_append_admin',
 			array( $this, 'show_page' ),
-			'dashicons-editor-code',
+			'dashicons-chart-line',
 			'50.0'
 			);
 	}

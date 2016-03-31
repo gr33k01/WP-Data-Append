@@ -72,4 +72,18 @@ function run_wp_data_append() {
 	$plugin->run();
 
 }
+
+function register_ajax_calls(){
+	add_action( 'wp_ajax_get_gf_form_object', 'get_form_object' );	
+}
+
+function get_form_object() {
+	header('Content-Type: application/json');
+	echo json_encode(GFAPI::get_form($_POST['form_id']));
+	wp_die();
+}
+
+register_ajax_calls();
 run_wp_data_append();
+
+

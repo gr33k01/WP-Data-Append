@@ -154,6 +154,22 @@ class Wp_Data_Append_Admin {
 	 * @since    1.0.0
 	 */
 	public function register_settings() {
+		// Adds a Tower Data section
+		add_settings_section(
+			$this->option_prefix . '_towerdata',
+			__( 'TowerData', 'wp-data-append' ),
+			array( $this, $this->option_prefix . '_towerdata_cb' ),
+			$this->plugin_name
+			);
+
+		// Adds a WealthEngine section
+		add_settings_section(
+			$this->option_prefix . '_wealthengine',
+			__( 'WealthEngine', 'wp-data-append' ),
+			array( $this, $this->option_prefix . '_wealthengine_cb' ),
+			$this->plugin_name
+			);
+
 		// Adds a General section
 		add_settings_section(
 			$this->option_prefix . '_general',
@@ -161,6 +177,33 @@ class Wp_Data_Append_Admin {
 			array( $this, $this->option_prefix . '_general_cb' ),
 			$this->plugin_name
 			);
+
+
+		// Adds 'API License' field in TowerData secion
+		add_settings_field(
+			$this->option_prefix . '_towerdata_api_license',
+			__( 'API License', 'wp-data-append' ),
+			array( $this, $this->option_prefix . '_towerdata_api_license_cb' ),
+			$this->plugin_name,
+			$this->option_prefix . '_towerdata',
+			array( 'label_for' => $this->option_prefix . '_towerdata_api_license' )
+			);
+
+		// Registers the 'API License' field
+		register_setting( $this->plugin_name, $this->option_prefix . '_towerdata_api_license', array( $this, $this->option_prefix . '_sanitize_towerdata_api_license' ) );
+
+		// Adds 'API License' field in TowerData secion
+		add_settings_field(
+			$this->option_prefix . '_wealthengine_api_key',
+			__( 'API Key', 'wp-data-append' ),
+			array( $this, $this->option_prefix . '_wealthengine_api_key_cb' ),
+			$this->plugin_name,
+			$this->option_prefix . '_wealthengine',
+			array( 'label_for' => $this->option_prefix . '_wealthengine_api_key' )
+			);
+
+		// Registers the 'API License' field
+		register_setting( $this->plugin_name, $this->option_prefix . '_wealthengine_api_key', array( $this, $this->option_prefix . '_sanitize_wealthengine_api_key' ) );
 
 		// Adds 'Parameters to track' field in General secion
 		add_settings_field(
@@ -176,6 +219,14 @@ class Wp_Data_Append_Admin {
 		register_setting( $this->plugin_name, $this->option_prefix . '_forms_to_append', array( $this, $this->option_prefix . '_sanitize_forms_to_append' ) );
 	}
 
+	public function wp_data_append_towerdata_cb() {
+		echo '<hr />';
+	}
+
+	public function wp_data_append_wealthengine_cb() {
+		echo '<hr />';
+	}
+
 	public function wp_data_append_general_cb() {
 		echo '<hr />';
 	}
@@ -185,6 +236,43 @@ class Wp_Data_Append_Admin {
 	}
 
 	public function wp_data_append_sanitize_forms_to_append($value) {
-		return json_decode($value);
+		$value = json_decode($value);
+
+		// Remove form maps with no form id
+		for($i = 0; $i < count($value); $i++) {
+			if($value[$i]->formId == null) {
+				unset($value[$i]);
+			}
+		}
+		// echo '<pre>'; var_dump($value); echo '</pre>'; exit();
+		return $value;
 	}
+
+	public function wp_data_append_towerdata_api_license_cb() {
+		$f_id = $this->option_prefix . '_towerdata_api_license';
+		$value = get_option($f_id);
+	?>
+		<input type="text" name="<?php echo $f_id; ?>" id="<?php echo $f_id; ?>"  value="<?php echo $value; ?>"/>
+		<em class="description">A valid TowerData API license.</em>
+	<?php
+	}
+
+	public function wp_data_append_sanitize_towerdata_api_license($value) {
+		return $value;
+	}
+
+	public function wp_data_append_wealthengine_api_key_cb() {
+		$f_id = $this->option_prefix . '_wealthengine_api_key';
+		$value = get_option($f_id);
+	?>
+		<input type="text" name="<?php echo $f_id; ?>" id="<?php echo $f_id; ?>"  value="<?php echo $value; ?>"/>
+		<em class="description">A valid WealthEngine API key.</em>
+	<?php
+	}
+
+	public function wp_data_append_sanitize_wealthengine_api_key($value) {
+		return $value;
+	}
+
+	
 }

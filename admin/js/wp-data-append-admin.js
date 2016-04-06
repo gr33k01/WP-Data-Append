@@ -1,5 +1,20 @@
 angular
 	.module('wpDataAppendSettings', [])
+
+		.directive('ngReallyClick', [function() {
+		    return {
+		        restrict: 'A',
+		        link: function(scope, element, attrs) {
+		            element.bind('click', function() {
+		                var message = attrs.ngReallyMessage;
+		                if (message && confirm(message)) {
+		                    scope.$apply(attrs.ngReallyClick);
+		                }
+		            });
+		        }
+		    }
+		}])
+
 		.controller('SettingsController', ['$scope','$http', '$httpParamSerializerJQLike', function($scope, $http, $httpParamSerializerJQLike){
 			$scope.formMaps = [];
 
@@ -13,7 +28,9 @@ angular
 					address2FieldId: null,
 					cityFieldId: null,
 					stateFieldId: null,
-					zipFieldId: null
+					zipFieldId: null,
+					enableTowerData: true,
+					enableWealthEngine: true
 				});
 			};
 
@@ -38,6 +55,7 @@ angular
 		.controller('FormToAppendController', ['$scope','$http', '$httpParamSerializerJQLike', function($scope, $http, $httpParamSerializerJQLike){
 			$scope.gfFormObject = null;
 			$scope.formFields = null;
+			$scope.currentlyEditing = false;
 
 			$scope.getFormFields = function() {
 				if(!$scope.form.formId) return;
@@ -55,4 +73,14 @@ angular
 					$scope.formFields = response.data.fields;
 				});
 			};
+
+			$scope.removeFormMap = function(formMaps, index) {
+				formMaps.splice(index, 1);
+			};
+
+			$scope.init = function() {
+				if(!$scope.form.formId) $scope.currentlyEditing = true;
+			};
+
+			$scope.init();
 		}]);

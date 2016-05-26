@@ -5,6 +5,7 @@
 .buttons {
     clear: both;
 }
+
 .form-to-append {
     border-bottom: 1px solid #ddd;
     float: left;
@@ -108,3 +109,12 @@ input[type="text"] {
     max-width: 400px;
 }
 
+select.ng-invalid-required {
+    border-color: #c0392b;
+    -webkit-box-shadow: 0 0 2px rgba(192, 57, 43, .8);
+    box-shadow: 0 0 2px rgba(192, 57, 43, .8);
+}
+
+.wp-data-append-settings .button-primary {
+    margin-bottom: 2em;
+}

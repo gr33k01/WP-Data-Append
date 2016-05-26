@@ -4,22 +4,27 @@ $forms = GFAPI::get_forms();
 $f_id = $this->option_prefix . '_forms_to_append'; ?>
 
 <div class="forms-to-append" ng-controller="SettingsController as settings">
+	<a class="button button-secondary" 
+			ng-click="addFormMap()"
+			ng-disabled="formsToAppendForm.$invalid">Add Form to Data Append</a>
+	<input type="submit" name="submit" id="submit" class="button button-primary" value="Update Settings" 
+            ng-disabled="formsToAppendForm.$invalid">
 
 	<input type="hidden" value="{{formMaps}}" name="<?php echo $f_id; ?>" id="<?php echo $f_id; ?>"/>
 
-	<div class="forms-list">
+	<div class="forms-list" ng-form="formsToAppendForm">
 		<div class="form-to-append" 
 			ng-repeat="form in formMaps" 
 			ng-controller="FormToAppendController as formMap" 
 			ng-model="formMaps">
 
 
-			<div class="setting-column">
-				<!-- <label>Form to Map</label> -->
+			<div class="setting-column">				
 				<select ng-model="form.formId" 
 						ng-change="getFormFields()" 
 						ng-init="getFormFields()"
-						ng-disabled="!currentlyEditing">
+						ng-disabled="!currentlyEditing"
+						ng-required="true">
 					 <option value="">Select a Form to Append Data To</option>
 				<?php foreach($forms as $form) : ?>
 					<option value="<?php echo $form["id"]; ?>"><?php echo '(' . $form['id'] . ') ' . $form["title"]; ?></option>
@@ -30,17 +35,19 @@ $f_id = $this->option_prefix . '_forms_to_append'; ?>
 			<div class="setting-column" ng-show="currentlyEditing">
 				<label>First Name Field</label>
 				<select ng-disabled="!form.formId || !currentlyEditing" 
-						ng-model="form.firstNameFieldId" >
+						ng-model="form.firstNameFieldId" 
+						ng-required="form.formId != null">
 
 					<option value="">Select a Field</option>
-					<option ng-repeat="field in formFields | orderBy: 'id'" value="{{ field.id }}">({{ field.id }}) {{ field.label }}</option>
+					<option ng-repeat="field in formFields | orderBy: 'id' | filterFieldTypes" value="{{ field.id }}">({{ field.id }}) {{ field.label }}</option>
 				</select>
 			</div>
 
 			<div class="setting-column" ng-show="currentlyEditing">
 				<label>Last Name Field</label>
 				<select ng-disabled="!form.formId || !currentlyEditing" 
-						ng-model="form.lastNameFieldId">
+						ng-model="form.lastNameFieldId"
+						ng-required="form.formId != null">
 
 					<option value="">Select a Field</option>
 					<option ng-repeat="field in formFields | orderBy: 'id'" value="{{ field.id }}">({{ field.id }}) {{ field.label }}</option>
@@ -50,7 +57,8 @@ $f_id = $this->option_prefix . '_forms_to_append'; ?>
 			<div class="setting-column" ng-show="currentlyEditing">
 				<label>Email Field</label>
 				<select ng-disabled="!form.formId || !currentlyEditing" 
-						ng-model="form.emailFieldId">
+						ng-model="form.emailFieldId"
+						ng-required="form.formId != null">>
 
 					<option value="">Select a Field</option>
 					<option ng-repeat="field in formFields | orderBy: 'id'" value="{{ field.id }}">({{ field.id }}) {{ field.label }}</option>
@@ -58,49 +66,66 @@ $f_id = $this->option_prefix . '_forms_to_append'; ?>
 			</div>
 
 			<div class="setting-column" ng-show="currentlyEditing">
-				<label>Address Field</label>
+				<label>Full Address Field</label>
 				<select ng-disabled="!form.formId || !currentlyEditing" 
-						ng-model="form.addressFieldId">
+						ng-model="form.fullAddressFieldId"
+						ng-required="form.formId != null">
+
+					<option value="">Select a Field</option>
+					<option ng-repeat="field in formFields | orderBy: 'id' | filter:{type:'address'}" value="{{ field.id }}">({{ field.id }}) {{ field.label }}</option>
+					<option value="none">Use Multiple Text Fields</option>
+				</select>
+			</div>
+
+			<div class="setting-column" ng-show="currentlyEditing && form.fullAddressFieldId == 'none'">
+				<label>Address Line 1 Field</label>
+				<select ng-disabled="!form.formId || !currentlyEditing" 
+						ng-model="form.address1FieldId"
+						ng-required="form.formId != null && form.fullAddressFieldId == 'none'">
 
 					<option value="">Select a Field</option>
 					<option ng-repeat="field in formFields | orderBy: 'id'" value="{{ field.id }}">({{ field.id }}) {{ field.label }}</option>
 				</select>
 			</div>
 
-			<div class="setting-column" ng-show="currentlyEditing">
+			<div class="setting-column" ng-show="currentlyEditing && form.fullAddressFieldId == 'none'">
 				<label>Address Line 2 Field</label>
 				<select ng-disabled="!form.formId || !currentlyEditing" 
-						ng-model="form.address2FieldId">
+						ng-model="form.address2FieldId"
+						ng-required="form.formId != null && form.fullAddressFieldId == 'none'">
 
 					<option value="">Select a Field</option>
 					<option ng-repeat="field in formFields | orderBy: 'id'" value="{{ field.id }}">({{ field.id }}) {{ field.label }}</option>
 				</select>
 			</div>
 
-			<div class="setting-column" ng-show="currentlyEditing">
+			<div class="setting-column" ng-show="currentlyEditing && form.fullAddressFieldId == 'none'">
 				<label>City Field</label>
 				<select ng-disabled="!form.formId || !currentlyEditing" 
-						ng-model="form.cityFieldId">
+						ng-model="form.cityFieldId"
+						ng-required="form.formId != null && form.fullAddressFieldId == 'none'">
 
 					<option value="">Select a Field</option>
 					<option ng-repeat="field in formFields | orderBy: 'id'" value="{{ field.id }}">({{ field.id }}) {{ field.label }}</option>
 				</select>
 			</div>
 
-			<div class="setting-column" ng-show="currentlyEditing">
+			<div class="setting-column" ng-show="currentlyEditing && form.fullAddressFieldId == 'none'">
 				<label>State Field</label>
 				<select ng-disabled="!form.formId || !currentlyEditing" 
-						ng-model="form.stateFieldId">
+						ng-model="form.stateFieldId"
+						ng-required="form.formId != null && form.fullAddressFieldId == 'none'">
 
 					<option value="">Select a Field</option>
 					<option ng-repeat="field in formFields | orderBy: 'id'" value="{{ field.id }}">({{ field.id }}) {{ field.label }}</option>
 				</select>
 			</div>
 
-			<div class="setting-column" ng-show="currentlyEditing">
+			<div class="setting-column" ng-show="currentlyEditing && form.fullAddressFieldId == 'none'">
 				<label>Zip Field</label>
 				<select ng-disabled="!form.formId || !currentlyEditing" 
-						ng-model="form.zipFieldId">
+						ng-model="form.zipFieldId"
+						ng-required="form.formId != null && form.fullAddressFieldId == 'none'">	
 
 					<option value="">Select a Field</option>
 					<option ng-repeat="field in formFields | orderBy: 'id'" value="{{ field.id }}">({{ field.id }}) {{ field.label }}</option>
@@ -109,31 +134,27 @@ $f_id = $this->option_prefix . '_forms_to_append'; ?>
 
 			<div class="checkboxes" ng-show="currentlyEditing">
 				<div class="checkbox-group">
-					<input type="checkbox" id="enableTowerData"
+					<input type="checkbox" id="enableTowerData{{$index}}" name="enableTowerData{{$index}}"
 						ng-model="form.enableTowerData"
 						ng-disabled="!currentlyEditing" />
-					<label for="enableTowerData">Enable TowerData</label>
+					<label for="enableTowerData{{$index}}">Enable TowerData</label>
 				</div>
 				<div class="checkbox-group">
-					<input type="checkbox" id="enableWealthEngine" 
+					<input type="checkbox" id="enableWealthEngine{{$index}}" name="enableWealthEngine{{$index}}" 
 						ng-model="form.enableWealthEngine" 
 						ng-disabled="!currentlyEditing"/>
-					<label for="enableWealthEngine">Enable WealthEngine</label>
+					<label for="enableWealthEngine{{$index}}">Enable WealthEngine</label>
 				</div>
 			</div>
 
 			<div class="actions">
-				<a class="edit" ng-click="currentlyEditing = !currentlyEditing">{{ currentlyEditing ? 'Done' : 'Edit'}}</a>
+				<a class="edit" ng-click="done($index)">{{ currentlyEditing ? 'Done' : 'Edit'}}</a>
 				<span>|</span>
-				<a class="remove"
-					ng-really-message="Removing will only stop future data appends. The Gravity Forms object will not be modified and previous data appends will be avaliable to view and export. Are you sure you want to remove this form from data appends?"
-					ng-really-click="removeFormMap(formMaps, $index)">Remove</a>
+				<a class="remove"					
+					ng-click="removeFormMap(formMaps, $index)">Remove</a>
 			</div>
 		</div>
 	</div>
-
-	<div class="buttons">
-		<a class="button button-secondary" ng-click="addFormMap()">Add Form to Data Append</a>
-	</div>
 </div>
+
 

@@ -1,20 +1,12 @@
 <?php
 
 class Logger {
-    
     private $logFilePath;
     private $fileHandle;
-    private $logPrefix;
-    
+        
     public function __construct($path, $fileExtension = '.txt') {
-        try {
-            $this->logFilePath = $path . 'DataAppend-' . date('Y-m-d') . $fileExtension;
-            $this->fileHandle = fopen($this->logFilePath, 'a');
-            $this->logPrefix = '<' . date('Y-m-d G:i:s') . '> ';   
-        }
-        catch (Exception $e) {
-            
-        }
+        $this->logFilePath = $path . 'DataAppend-' . date('Y-m-d') . $fileExtension;
+        $this->fileHandle = fopen($this->logFilePath, 'a');
     }
     
     public function __destruct() {
@@ -36,11 +28,6 @@ class Logger {
     }
     
     private function write($message) {
-        try {
-            fwrite($this->fileHandle, "\n" . $this->logPrefix . $message);    
-        }
-        catch(Exception $e) {
-            
-        }
+        fwrite($this->fileHandle, "\n" . '<' . date('Y-m-d G:i:s') . '> ' . $message);    
     }
 }

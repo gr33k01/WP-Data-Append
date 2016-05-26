@@ -67,10 +67,8 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-wp-data-append.php';
  * @since    1.0.0
  */
 function run_wp_data_append() {
-
 	$plugin = new Wp_Data_Append();
 	$plugin->run();
-
 }
 
 function register_ajax_calls(){
@@ -88,7 +86,7 @@ function get_saved_data_append_settings() {
 	header('Content-Type: application/json');
 	echo json_encode(get_option(wp_data_append_forms_to_append));
 	wp_die();
-};
+}
 
 register_ajax_calls();
 run_wp_data_append();

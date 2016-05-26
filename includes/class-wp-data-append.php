@@ -114,6 +114,21 @@ class Wp_Data_Append {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-wp-data-append-i18n.php';
 
 		/**
+		 * The class responsible for returning data for both public and admin
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-wp-data-append-service.php';
+
+		/**
+		 * Tower Data API
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/TowerData/TowerDataApi.php';
+
+		/**
+		 * Wealth Engine API
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/WealthEngine/WealthEngine-SDK.php';
+
+		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-wp-data-append-admin.php';
@@ -160,10 +175,8 @@ class Wp_Data_Append {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'register_settings' );
-		$this->loader->add_action( 'wp_ajax_get_gf_form_object', $plugin_admin, 'get_gf_form_object' );
-		$this->loader->add_action( 'wp_ajax_mildew', $plugin_admin, 'different_cb_name' );
-
-
+	
+		$this->loader->add_action( 'wp_ajax_remove_form_map', $plugin_admin, 'remove_form_map' );
 	}
 
 	/**
@@ -179,7 +192,7 @@ class Wp_Data_Append {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
-
+		$this->loader->add_action( 'gform_pre_submission', $plugin_public, 'append_data', 10, 2 );
 	}
 
 	/**

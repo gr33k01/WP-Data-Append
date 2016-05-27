@@ -278,7 +278,8 @@ class Wp_Data_Append_Admin {
 		}
 		foreach($value as $form) {
 			$hiddenFieldMap = $this->create_fields($form->formId);
-			$form->hiddenFieldMap = $hiddenFieldMap;			
+			$form->hiddenFieldMap = $hiddenFieldMap;
+			$form->fromDb = true;			
 		}
 		
 		return $value;
@@ -329,7 +330,7 @@ class Wp_Data_Append_Admin {
 	public function wp_data_append_sanitize_wealthengine_api_key($value) {
 		return $value;
 	}
-	
+
 	/**
 	 * Creates data append fields on a form if they do not exist
 	 *
@@ -366,7 +367,7 @@ class Wp_Data_Append_Admin {
 	    foreach ($the_labels as $label => $needed) {
 	        if ($needed) {
 	        	$new_id = ++ $max_id;
-	        	$this->logger->info('Adding field ' . $label . ' to ' . $form['title']);
+	        	// $this->logger->info('Adding field ' . $label . ' to ' . $form['title']);
 	            array_push($form['fields'], array(
 	                'type'  => 'hidden',
 	                'label' => $label,
@@ -384,9 +385,9 @@ class Wp_Data_Append_Admin {
 	    }	
 
 	    if(!$form_change) {
-	    	$this->logger->info('No fields added to ' . $form['title']);
+	    	// $this->logger->info('No fields added to ' . $form['title']);
 	    }
-
+	    // echo '<pre>'; var_dump($form); echo '</pre>'; exit();
 	    return $hiddenFieldMap;
 	}	
 

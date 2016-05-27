@@ -25,6 +25,7 @@ $f_id = $this->option_prefix . '_forms_to_append'; ?>
 						ng-init="getFormFields()"
 						ng-disabled="!currentlyEditing"
 						ng-required="true">
+
 					 <option value="">Select a Form to Append Data To</option>
 				<?php foreach($forms as $form) : ?>
 					<option value="<?php echo $form["id"]; ?>"><?php echo '(' . $form['id'] . ') ' . $form["title"]; ?></option>
@@ -33,26 +34,40 @@ $f_id = $this->option_prefix . '_forms_to_append'; ?>
 			</div>
 
 			<div class="setting-column" ng-show="currentlyEditing">
+				<label>Full Name Field</label>
+				<select ng-disabled="!form.formId || !currentlyEditing" 
+						ng-model="form.fullNameFieldId" 
+						ng-required="form.formId != null">
+
+					<option value="">Select a Field</option>
+					<option ng-repeat="field in formFields | orderBy: 'id' | filter:{type:'name'}" value="{{ field.id }}">({{ field.id }}) {{ field.label }}</option>
+					<option value="none">Use Multiple Text Fields</option>
+				</select>
+			</div>
+
+			<div class="setting-column" ng-show="currentlyEditing && form.fullNameFieldId == 'none'">
 				<label>First Name Field</label>
 				<select ng-disabled="!form.formId || !currentlyEditing" 
 						ng-model="form.firstNameFieldId" 
-						ng-required="form.formId != null">
+						ng-required="form.formId != null && form.fullNameFieldId == 'none'">
 
 					<option value="">Select a Field</option>
 					<option ng-repeat="field in formFields | orderBy: 'id' | filterFieldTypes" value="{{ field.id }}">({{ field.id }}) {{ field.label }}</option>
 				</select>
 			</div>
 
-			<div class="setting-column" ng-show="currentlyEditing">
+			<div class="setting-column" ng-show="currentlyEditing && form.fullNameFieldId == 'none'">
 				<label>Last Name Field</label>
 				<select ng-disabled="!form.formId || !currentlyEditing" 
 						ng-model="form.lastNameFieldId"
-						ng-required="form.formId != null">
+						ng-required="form.formId != null && form.fullNameFieldId == 'none'">
 
 					<option value="">Select a Field</option>
-					<option ng-repeat="field in formFields | orderBy: 'id'" value="{{ field.id }}">({{ field.id }}) {{ field.label }}</option>
+					<option ng-repeat="field in formFields | orderBy: 'id' | filterFieldTypes" value="{{ field.id }}">({{ field.id }}) {{ field.label }}</option>
 				</select>
 			</div>
+
+			<br />
 
 			<div class="setting-column" ng-show="currentlyEditing">
 				<label>Email Field</label>
@@ -61,9 +76,11 @@ $f_id = $this->option_prefix . '_forms_to_append'; ?>
 						ng-required="form.formId != null">>
 
 					<option value="">Select a Field</option>
-					<option ng-repeat="field in formFields | orderBy: 'id'" value="{{ field.id }}">({{ field.id }}) {{ field.label }}</option>
+					<option ng-repeat="field in formFields | orderBy: 'id' | filterFieldTypes" value="{{ field.id }}">({{ field.id }}) {{ field.label }}</option>
 				</select>
 			</div>
+
+			<br />
 
 			<div class="setting-column" ng-show="currentlyEditing">
 				<label>Full Address Field</label>
@@ -84,7 +101,7 @@ $f_id = $this->option_prefix . '_forms_to_append'; ?>
 						ng-required="form.formId != null && form.fullAddressFieldId == 'none'">
 
 					<option value="">Select a Field</option>
-					<option ng-repeat="field in formFields | orderBy: 'id'" value="{{ field.id }}">({{ field.id }}) {{ field.label }}</option>
+					<option ng-repeat="field in formFields | orderBy: 'id' | filterFieldTypes" value="{{ field.id }}">({{ field.id }}) {{ field.label }}</option>
 				</select>
 			</div>
 
@@ -95,7 +112,7 @@ $f_id = $this->option_prefix . '_forms_to_append'; ?>
 						ng-required="form.formId != null && form.fullAddressFieldId == 'none'">
 
 					<option value="">Select a Field</option>
-					<option ng-repeat="field in formFields | orderBy: 'id'" value="{{ field.id }}">({{ field.id }}) {{ field.label }}</option>
+					<option ng-repeat="field in formFields | orderBy: 'id' | filterFieldTypes" value="{{ field.id }}">({{ field.id }}) {{ field.label }}</option>
 				</select>
 			</div>
 
@@ -106,7 +123,7 @@ $f_id = $this->option_prefix . '_forms_to_append'; ?>
 						ng-required="form.formId != null && form.fullAddressFieldId == 'none'">
 
 					<option value="">Select a Field</option>
-					<option ng-repeat="field in formFields | orderBy: 'id'" value="{{ field.id }}">({{ field.id }}) {{ field.label }}</option>
+					<option ng-repeat="field in formFields | orderBy: 'id' | filterFieldTypes" value="{{ field.id }}">({{ field.id }}) {{ field.label }}</option>
 				</select>
 			</div>
 
@@ -117,7 +134,7 @@ $f_id = $this->option_prefix . '_forms_to_append'; ?>
 						ng-required="form.formId != null && form.fullAddressFieldId == 'none'">
 
 					<option value="">Select a Field</option>
-					<option ng-repeat="field in formFields | orderBy: 'id'" value="{{ field.id }}">({{ field.id }}) {{ field.label }}</option>
+					<option ng-repeat="field in formFields | orderBy: 'id' | filterFieldTypes" value="{{ field.id }}">({{ field.id }}) {{ field.label }}</option>
 				</select>
 			</div>
 
@@ -128,7 +145,7 @@ $f_id = $this->option_prefix . '_forms_to_append'; ?>
 						ng-required="form.formId != null && form.fullAddressFieldId == 'none'">	
 
 					<option value="">Select a Field</option>
-					<option ng-repeat="field in formFields | orderBy: 'id'" value="{{ field.id }}">({{ field.id }}) {{ field.label }}</option>
+					<option ng-repeat="field in formFields | orderBy: 'id' | filterFieldTypes" value="{{ field.id }}">({{ field.id }}) {{ field.label }}</option>
 				</select>
 			</div>
 

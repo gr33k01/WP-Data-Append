@@ -48,10 +48,8 @@ class Wp_Data_Append_Public {
 	 * @param      string    $version    The version of this plugin.
 	 */
 	public function __construct( $plugin_name, $version ) {
-
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
-
 	}
 
 	/**
@@ -60,21 +58,7 @@ class Wp_Data_Append_Public {
 	 * @since    1.0.0
 	 */
 	public function enqueue_styles() {
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Wp_Data_Append_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Wp_Data_Append_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/wp-data-append-public.css', array(), $this->version, 'all' );
-
 	}
 
 	/**
@@ -83,21 +67,7 @@ class Wp_Data_Append_Public {
 	 * @since    1.0.0
 	 */
 	public function enqueue_scripts() {
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Wp_Data_Append_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Wp_Data_Append_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/wp-data-append-public.js', array( 'jquery' ), $this->version, false );
-
 	}
 
 	/**
@@ -110,40 +80,39 @@ class Wp_Data_Append_Public {
 		$fma = null;
 		$tower_data_results = null;
 		$wealth_engine_results = null;
-		$submission = null;
-
+		$submission = new stdClass();
+		echo '<pre>'; var_dump($form); echo '</pre>'; exit();
 		foreach($forms_to_append as $fta) {
 			if($form['id'] == $fta->formId) {
 				$fma = $fta;
 			}
+		}		
+		if($fma == null) return;
+		$has_full_address_field = $fma->fullAddressFieldId != 'none';		
+		$has_full_name_field = $fma->fullNameFieldId != 'none';
+
+		if($has_full_name_field) {
+			$submission->first = $_POST['input_' . $fma->fullNameFieldId . '_3'];
+			$submission->last = $_POST['input_' . $fma->fullNameFieldId . '_6'];
+		} else {
+			$submission->first = $_POST['input_' . $fma->firstNameFieldId];
+			$submission->last = $_POST['input_' . $fma->lastNameFieldId];
 		}
 
-		if($fma == null) return;
-
-		$has_full_address_field = $fma->fullAddressFieldId != 'none';		
+		$submission->email = $_POST['input_' . $fma->emailFieldId];
 
 		if($has_full_address_field) {
-			$submission = (object) array (
-				'first' => $_POST['input_' . $fma->firstNameFieldId],
-				'last' => $_POST['input_' . $fma->lastNameFieldId],
-				'email' => $_POST['input_' . $fma->emailFieldId],			
-				'address1' => $_POST['input_' . $fma->fullAddressFieldId . '_1'],
-				'address2' => $_POST['input_' . $fma->fullAddressFieldId . '_2'],
-				'city' => $_POST['input_' . $fma->fullAddressFieldId . '_3'],
-				'state' => $_POST['input_' . $fma->fullAddressFieldId . '_4'],
-				'zip' => $_POST['input_' . $fma->fullAddressFieldId . '_5'],
-				);
+			$submission->address1 = $_POST['input_' . $fma->fullAddressFieldId . '_1'];
+			$submission->address2 = $_POST['input_' . $fma->fullAddressFieldId . '_2'];
+			$submission->city = $_POST['input_' . $fma->fullAddressFieldId . '_3'];
+			$submission->state = $_POST['input_' . $fma->fullAddressFieldId . '_4'];
+			$submission->zip = $_POST['input_' . $fma->fullAddressFieldId . '_5'];
 		} else {
-			$submission = (object) array (
-				'first' => $_POST['input_' . $fma->firstNameFieldId],
-				'last' => $_POST['input_' . $fma->lastNameFieldId],
-				'email' => $_POST['input_' . $fma->emailFieldId],			
-				'address1' => $_POST['input_' . $fma->address1FieldId],
-				'address2' => $_POST['input_' . $fma->address2FieldId],
-				'city' => $_POST['input_' . $fma->cityFieldId],
-				'state' => $_POST['input_' . $fma->stateFieldId],
-				'zip' => $_POST['input_' . $fma->zipFieldId]
-				);
+			$submission->address1 = $_POST['input_' . $fma->address1FieldId];
+			$submission->address2 = $_POST['input_' . $fma->address2FieldId];
+			$submission->city = $_POST['input_' . $fma->cityFieldId];
+			$submission->state = $_POST['input_' . $fma->stateFieldId];
+			$submission->zip = $_POST['input_' . $fma->zipFieldId];
 		}				
 		if($fma->enableTowerData) {
 			$tower_data_results = $this->get_tower_data_data($submission, $fma);	
@@ -154,7 +123,7 @@ class Wp_Data_Append_Public {
 		$this->save_results($tower_data_results, $wealth_engine_results, $fma);
 	}
 
-	private function save_results($td, $we, $fma) {			
+	private function save_results($td, $we, $fma) {				
 		$results_arr = array_merge($td, $we);		
 		foreach($fma->hiddenFieldMap as $key => $value) {
 			$_POST['input_' . $value] = $results_arr[$key];			
@@ -186,7 +155,7 @@ class Wp_Data_Append_Public {
 		$key = get_option('wp_data_append_wealthengine_api_key');
 		$we = new WealthEngine\API\HttpClient($key, 'prod', 'full');
 		$result = $we->getProfileByAddress($s->last, $s->first, $s->address1, $s->city, $s->state, intval($s->zip));
-		if($result->status_code != '200') {
+		if($result->status_code != '200'){
 			$result = $we->getProfileByEmailAddress($s->email, $s->first, $s->last);
 		}
 		$we_results_arr = array(
@@ -222,8 +191,8 @@ class Wp_Data_Append_Public {
             'we_vehicle_ownership'              =>  $result->vehicles->ownership->text,
             'we_is_board_member'                =>  $result->professional->board_member,
             'we_jobs'                           =>  $result->jobs == null ? null : json_encode($result->jobs),           
-            'we_raw_result'                     => json_encode( $result ),
-        );                      
+            'we_raw_result'                     =>  json_encode($result),
+        );                              
         $addresses = $result->locations;
         $we_results_arr['we_address_1'] = $this->get_we_address_string($addresses, 0);
         $we_results_arr['we_address_2'] = $this->get_we_address_string($addresses, 1);

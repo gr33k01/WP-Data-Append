@@ -1,6 +1,5 @@
 var app = angular.module('wpDataAppendSettings', []);
 
-
 app.filter('filterFieldTypes', function() {
 	function filterFieldTypes(fields) {
 		var returnFields = [],
@@ -14,7 +13,8 @@ app.filter('filterFieldTypes', function() {
 	};
 
 	return filterFieldTypes;
-})
+});
+
 app.controller('SettingsController', ['$scope','$http', '$httpParamSerializerJQLike', function($scope, $http, $httpParamSerializerJQLike){
 	$scope.formMaps = [];
 
@@ -22,6 +22,7 @@ app.controller('SettingsController', ['$scope','$http', '$httpParamSerializerJQL
 		if($scope.formsToAppendForm.$invalid) return;
 		$scope.formMaps.push({
 			formId: null,
+			fullNameFieldId: null,
 			firstNameFieldId: null,
 			lastNameFieldId: null,
 			emailFieldId: null,
@@ -48,17 +49,14 @@ app.controller('SettingsController', ['$scope','$http', '$httpParamSerializerJQL
 		}
 
 		$http(req).then(function(response) {
-			if(response.data.length > 0) {
-				for(var i = 0; i < response.data.length; i++) {
-					response.data[i].fromDb = true;
-				}
+			if(response.data.length > 0) {				
 				$scope.formMaps = response.data;	
 			}
 		});
 	};
 
 	$scope.getSavedFormMaps();
-}])
+}]);
 
 app.controller('FormToAppendController', ['$scope','$http', '$httpParamSerializerJQLike', function($scope, $http, $httpParamSerializerJQLike){
 	$scope.gfFormObject = null;
@@ -68,6 +66,15 @@ app.controller('FormToAppendController', ['$scope','$http', '$httpParamSerialize
 
 	$scope.getFormFields = function() {
 		if(!$scope.form.formId) return;
+
+		for(var i = 0; i < $scope.formMaps.length; i++) {
+			if($scope.form.formId == $scope.formMaps[i].formId 
+					&& !$scope.form.fromDb && $scope.formMaps[i].fromDb) {
+				window.alert('This form has already been configured for data appends.');
+				$scope.form.formId = null;
+				return;
+			}
+		}
 
 		var req = {
 			method: 'POST',

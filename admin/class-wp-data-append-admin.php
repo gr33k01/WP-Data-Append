@@ -292,10 +292,20 @@ class Wp_Data_Append_Admin {
 	 */
 	public function wp_data_append_towerdata_api_license_cb() {
 		$f_id = $this->option_prefix . '_towerdata_api_license';
+		$is_valid = get_option($this->option_prefix . '_valid_td_key');
+		$class = $is_valid ? 'valid' : 'invalid';
 		$value = get_option($f_id);
 	?>
-		<input type="text" name="<?php echo $f_id; ?>" id="<?php echo $f_id; ?>"  value="<?php echo $value; ?>"/>
-		<em class="description">A valid TowerData API license.</em>
+		<div class="<?php echo $this->option_prefix; ?>-input-group <?php if(trim($value) != '') echo $class; ?>">
+			<input type="text" name="<?php echo $f_id; ?>" id="<?php echo $f_id; ?>"  value="<?php echo $value; ?>"/>
+			<?php if(trim($value) == '') : ?>
+			<em class="description">A valid production-level TowerData API license.</em>
+			<?php elseif($is_valid) : ?>
+			<em class="description"><span class="dashicons dashicons-yes"></span> Nice. Your TowerData API license is valid.</em>
+			<?php else : ?>
+			<em class="description"><span class="dashicons dashicons-no-alt"></span> Oops. Your TowerData API license is invalid.</em>
+			<?php endif; ?>
+		</div>
 	<?php
 	}
 
@@ -305,6 +315,11 @@ class Wp_Data_Append_Admin {
 	 * @since    1.0.0
 	 */
 	public function wp_data_append_sanitize_towerdata_api_license($value) {
+		if(trim($value) != '') {
+			update_option($this->option_prefix . '_valid_td_key', $this->is_valid_td_key($value));
+		} else {
+			update_option($this->option_prefix . '_valid_td_key', false);
+		}
 		return $value;
 	}
 
@@ -315,10 +330,20 @@ class Wp_Data_Append_Admin {
 	 */
 	public function wp_data_append_wealthengine_api_key_cb() {
 		$f_id = $this->option_prefix . '_wealthengine_api_key';
+		$is_valid = get_option($this->option_prefix . '_valid_we_key');
+		$class = $is_valid ? 'valid' : 'invalid';
 		$value = get_option($f_id);
 	?>
-		<input type="text" name="<?php echo $f_id; ?>" id="<?php echo $f_id; ?>"  value="<?php echo $value; ?>"/>
-		<em class="description">A valid WealthEngine API key.</em>
+		<div class="<?php echo $this->option_prefix; ?>-input-group <?php if(trim($value) != '') echo $class; ?>">
+			<input type="text" name="<?php echo $f_id; ?>" id="<?php echo $f_id; ?>"  value="<?php echo $value; ?>"/>
+			<?php if(trim($value) == '') : ?>
+			<em class="description">A valid production-level WealthEngine API key.</em>
+			<?php elseif($is_valid) : ?>
+			<em class="description"><span class="dashicons dashicons-yes"></span> Nice. Your WealthEngine API key is valid.</em>
+			<?php else : ?>
+			<em class="description"><span class="dashicons dashicons-no-alt"></span> Oops. Your WealthEngine API key is invalid.</em>
+			<?php endif; ?>
+		</div>
 	<?php
 	}
 
@@ -328,6 +353,11 @@ class Wp_Data_Append_Admin {
 	 * @since    1.0.0
 	 */
 	public function wp_data_append_sanitize_wealthengine_api_key($value) {
+		if(trim($value) != '') {
+			update_option($this->option_prefix . '_valid_we_key', $this->is_valid_we_key($value));
+		} else {
+			update_option($this->option_prefix . '_valid_we_key', false);
+		}		
 		return $value;
 	}
 
@@ -452,5 +482,35 @@ class Wp_Data_Append_Admin {
 			$message = 'Error removing fields from ' . $form['title'] .': ' . $e->getMessage();
 			$this->logger->error($message);
 		}		
+	}
+
+	/**
+	 * Checks for valid TowerData key
+	 *
+	 * @since    1.0.0
+	 */
+	private function is_valid_td_key($key) {
+		try {
+			$td = new TowerData\TowerDataApi($key);
+			$response = $td->query_by_email('test@gmail.com');		
+		}		
+		catch(Exception $e) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Checks for valid WealthEngine key
+	 *
+	 * @since    1.0.0
+	 */
+	private function is_valid_we_key($key) {
+		$we = new WealthEngine\API\HttpClient($key, 'prod', 'full');
+		$response = $we->getProfileByEmailAddress('test@gmail.com');			
+		if($response->status_code == 403) {
+			return false;
+		}
+		return true;
 	}
 }

@@ -4,6 +4,10 @@ app.filter('filterFieldTypes', function() {
 	function filterFieldTypes(fields) {
 		var returnFields = [],
 			fieldTypes = ['text', 'email', 'select', 'radio', 'number'];
+
+		if(fields == null) {
+			return [];
+		}	
 		for(var i = 0; i < fields.length; i++) {
 			if(fieldTypes.indexOf(fields[i].type) > -1) {
 				returnFields.push(fields[i]);

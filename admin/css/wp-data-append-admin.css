@@ -118,3 +118,33 @@ select.ng-invalid-required {
 .wp-data-append-settings .button-primary {
     margin-bottom: 2em;
 }
+
+.wp_data_append-input-group.valid em {
+    color: green;
+}
+
+.wp_data_append-input-group.valid input {
+    border-color: #27ae60;
+    -webkit-box-shadow: 0 0 2px rgba(39, 174, 96,.8);
+    box-shadow: 0 0 2px rgba(39, 174, 96,.8);
+}
+
+.wp_data_append-input-group em .dashicons {
+    font-size: 30px;
+    margin-right: 10px;
+}
+.wp_data_append-input-group.invalid em {
+    color: #c0392b;
+}
+.wp_data_append-input-group.invalid input {
+    border-color: #c0392b;
+    -webkit-box-shadow: 0 0 2px rgba(192, 57, 43, .8);
+    box-shadow: 0 0 2px rgba(192, 57, 43, .8);
+}
+
+
+.wp-data-append-settings h2 .dashicons {
+    font-size: 29px;
+    margin-right: 10px;
+}
+    

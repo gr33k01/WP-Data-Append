@@ -18,7 +18,6 @@ $f_id = $this->option_prefix . '_forms_to_append'; ?>
 			ng-controller="FormToAppendController as formMap" 
 			ng-model="formMaps">
 
-
 			<div class="setting-column">				
 				<select ng-model="form.formId" 
 						ng-change="getFormFields()" 

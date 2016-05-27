@@ -78,16 +78,24 @@ class Wp_Data_Append_Public {
 	public function append_data($form) {
 		$forms_to_append = get_option('wp_data_append_forms_to_append');		
 		$fma = null;
-		$tower_data_results = null;
-		$wealth_engine_results = null;
-		$submission = new stdClass();
-		echo '<pre>'; var_dump($form); echo '</pre>'; exit();
+		$tower_data_results = [];
+		$wealth_engine_results = [];
+
+		$valid_td_key = get_option('wp_data_append_valid_td_key');
+		$valid_we_key = get_option('wp_data_append_valid_we_key');
+
+		if(!$valid_we_key && !$valid_td_key) {
+			return;
+		}
+
+		$submission = new stdClass();		
 		foreach($forms_to_append as $fta) {
 			if($form['id'] == $fta->formId) {
 				$fma = $fta;
 			}
 		}		
 		if($fma == null) return;
+
 		$has_full_address_field = $fma->fullAddressFieldId != 'none';		
 		$has_full_name_field = $fma->fullNameFieldId != 'none';
 
@@ -114,17 +122,18 @@ class Wp_Data_Append_Public {
 			$submission->state = $_POST['input_' . $fma->stateFieldId];
 			$submission->zip = $_POST['input_' . $fma->zipFieldId];
 		}				
-		if($fma->enableTowerData) {
+		if($fma->enableTowerData && $valid_td_key) {
 			$tower_data_results = $this->get_tower_data_data($submission, $fma);	
 		}
-		if($fma->enableWealthEngine) {
+		if($fma->enableWealthEngine && $valid_we_key) {
 			$wealth_engine_results = $this->get_wealth_engine_data($submission, $fma);	
 		}		
 		$this->save_results($tower_data_results, $wealth_engine_results, $fma);
 	}
 
 	private function save_results($td, $we, $fma) {				
-		$results_arr = array_merge($td, $we);		
+		$results_arr = array_merge($td, $we);
+		if(count($results_arr) == 0) return;		
 		foreach($fma->hiddenFieldMap as $key => $value) {
 			$_POST['input_' . $value] = $results_arr[$key];			
 		}				
